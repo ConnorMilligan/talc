@@ -1,25 +1,23 @@
-use std::env::VarError;
+use octocrab::{Octocrab};
+use clap::Parser;
 
-use octocrab::Octocrab;
+#[derive(Parser, Debug)]
+#[clap(author, version, about, long_about = None)]
+struct Args {
+   /// Name of the organization to fetch repos from
+   #[clap(short, long, value_parser)]
+   org_name: String,
+}
 
 #[tokio::main]
 async fn main() -> octocrab::Result<()> {
-    let token = std::env::var("GITHUB_TOKEN");
-    let errorMsg = "Please set the GITHUB_TOKEN environment variable to your github token before using";
+    let token = std::env::var("GITHUB_TOKEN").expect("Please set the GITHUB_TOKEN environment variable to your github token before using");
+    let args = Args::parse();
 
-    let token = match token {
-        Ok(T) => T,
-        Err(_) => errorMsg.to_string(),
-    };
-
-    if token == errorMsg {
-        println!("{}", errorMsg);
-        std::process::exit(1);
-    }
 
     let octocrab = Octocrab::builder().personal_token(token.to_string()).build()?;
 
-    let orgs = octocrab.orgs("uvmcs120s2022").list_repos().send().await?;
+    let orgs = octocrab.orgs(args.org_name).list_repos().send().await.expect("Repository not found");
 
     println!("{:?}", orgs);
 

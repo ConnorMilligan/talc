@@ -1,1 +1,1 @@
-# talc
+# TALC, Teacher's Assistant's Lateness Calculator
