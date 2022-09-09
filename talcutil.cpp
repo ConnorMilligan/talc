@@ -44,7 +44,7 @@ std::string fetchRepos(std::string org) {
     curl = curl_easy_init();
 
     if(curl) {
-        curl_easy_setopt(curl, CURLOPT_URL, ("https://api.github.com/orgs/" + org + "/repos").c_str());
+        curl_easy_setopt(curl, CURLOPT_URL, ("https://api.github.com/orgs/" + org + "/repos?per_page=100").c_str());
 
         headers = curl_slist_append(headers, "User-Agent: Talc");
         headers = curl_slist_append(headers, ("Authorization: Bearer " + token).c_str());
@@ -52,7 +52,7 @@ std::string fetchRepos(std::string org) {
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER,headers);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
-        
+
         res = curl_easy_perform(curl);
     
         curl_easy_cleanup(curl);
