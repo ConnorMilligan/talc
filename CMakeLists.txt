@@ -9,5 +9,5 @@ find_package( CURL )
 include_directories( ${CURL_INCLUDE_DIRS} )
 link_directories( ${CURL_LIBRARIES} )
 
-add_executable(talc main.cpp)
+add_executable(talc main.cpp talcutil.cpp)
 target_link_libraries(talc curl)
