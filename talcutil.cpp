@@ -1,4 +1,10 @@
 #include "talcutil.h"
+ 
+static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp)
+{
+    ((std::string*)userp)->append((char*)contents, size * nmemb);
+    return size * nmemb;
+}
 
 int processArgs(commandArgs *args, int *argc, char ***argv) {
     args->organization = "\0";
@@ -24,30 +30,29 @@ int processArgs(commandArgs *args, int *argc, char ***argv) {
     }
 }
 
-int fetchRepos(std::string org) {
+std::string fetchRepos(std::string org) {
     CURL *curl;
     CURLcode res;
-
-    curl = curl_easy_init();
+    std::string readBuffer;
     std::string token = getenv("GITHUB_TOKEN");
     struct curl_slist *headers = NULL;
 
+    curl = curl_easy_init();
+
     if(curl) {
         curl_easy_setopt(curl, CURLOPT_URL, ("https://api.github.com/orgs/" + org + "/repos").c_str());
+
         headers = curl_slist_append(headers, "User-Agent: Talc");
         headers = curl_slist_append(headers, ("Authorization: Bearer " + token).c_str());
         
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER,headers);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
 
         res = curl_easy_perform(curl);
-
-        if(res != CURLE_OK) {
-            fprintf(stderr, "curl_easy_perform() failed: %s\n",
-                curl_easy_strerror(res));
-            return 1;
-        }
     
         curl_easy_cleanup(curl);
+        std::cout << readBuffer << std::endl;
     }
-    return 0;
+    return readBuffer;
 }
