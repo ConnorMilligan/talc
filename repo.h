@@ -16,7 +16,7 @@ public:
     Repo(cJSON *json);
 
     std::string getName();
-    void setName(std::string name);
+    std::string getAuthor();
     
 };
 

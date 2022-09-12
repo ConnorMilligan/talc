@@ -2,6 +2,7 @@
 #define COMMIT_H
 
 #include <string>
+#include <cjson/cJSON.h>
 
 class Commit
 {
@@ -9,9 +10,10 @@ private:
     std::string authorDate;
     std::string commitDate;
 public:
-    Commit(std::string organization);
+    Commit(cJSON *json);
 
-    
+    std::string getAuthorDate();
+    std::string getCommitDate();
 };
 
 #endif

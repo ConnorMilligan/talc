@@ -6,6 +6,34 @@ static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *use
     return size * nmemb;
 }
 
+std::string getCommits(std::string author, std::string repo) {
+    CURL *curl;
+    CURLcode res;
+    std::string readBuffer;
+    std::string token = getenv("GITHUB_TOKEN");
+    struct curl_slist *headers = NULL;
+
+    curl = curl_easy_init();
+
+    if(curl) {
+        curl_easy_setopt(curl, CURLOPT_URL, ("https://api.github.com/repos/" + author + repo + "/commits").c_str());
+
+        headers = curl_slist_append(headers, "User-Agent: Talc");
+        headers = curl_slist_append(headers, ("Authorization: Bearer " + token).c_str());
+        
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER,headers);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
+
+        res = curl_easy_perform(curl);
+    
+        curl_easy_cleanup(curl);
+    }
+
+    return readBuffer;
+}
+
+
 Github::Github() {
     this->organization = "";
 }
@@ -47,5 +75,8 @@ std::vector<Repo> Github::fetchAllRepos() {
 
     Repo myRepo(cJSON_GetArrayItem(cJSON_Parse(readBuffer.c_str()),1));
     printf("%s\n",myRepo.getName().c_str());
+
+    printf("%s\n",cJSON_Parse(getCommits(myRepo.getName(), this->organization).c_str())->valuestring);
+
     return repositories;
 }
