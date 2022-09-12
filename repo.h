@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <cjson/cJSON.h>
 
 #include "commit.h"
 
@@ -12,8 +13,10 @@ private:
     std::string name;
     std::vector<Commit> commits;
 public:
-    Repo(std::string organization);
+    Repo(cJSON *json);
 
+    std::string getName();
+    void setName(std::string name);
     
 };
 

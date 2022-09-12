@@ -17,7 +17,7 @@ Github::Github(std::string organization) {
 std::vector<Repo> Github::fetchProject(std::string assignment) {
     std::vector<Repo> repositories;
 
-
+    return repositories;
 }
 
 std::vector<Repo> Github::fetchAllRepos() {
@@ -44,6 +44,8 @@ std::vector<Repo> Github::fetchAllRepos() {
     
         curl_easy_cleanup(curl);
     }
-    printf("%s\n",cJSON_Print(cJSON_Parse(readBuffer.c_str())));
+
+    Repo myRepo(cJSON_GetArrayItem(cJSON_Parse(readBuffer.c_str()),1));
+    printf("%s\n",myRepo.getName().c_str());
     return repositories;
 }
