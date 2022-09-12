@@ -9,7 +9,4 @@ struct commandArgs {
 
 int processArgs(commandArgs *args, int *argc, char ***argv);
 
-std::string fetchRepos(std::string org);
-
-
 #endif
