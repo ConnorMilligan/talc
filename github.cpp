@@ -6,12 +6,13 @@ static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *use
     return size * nmemb;
 }
 
-std::string Github::getCommits(std::string repo) {
+std::vector<Commit> Github::fetchCommits(std::string repo) {
     CURL *curl;
     CURLcode res;
     std::string readBuffer;
     std::string token = getenv("GITHUB_TOKEN");
     struct curl_slist *headers = NULL;
+    std::vector<Commit> commits;
 
     curl = curl_easy_init();
 
@@ -30,7 +31,12 @@ std::string Github::getCommits(std::string repo) {
         curl_easy_cleanup(curl);
     }
 
-    return readBuffer;
+    for (int i = 0; i < cJSON_GetArraySize(cJSON_Parse(readBuffer.c_str())); i++) {
+        Commit commit(cJSON_GetArrayItem(cJSON_Parse(readBuffer.c_str()),i));
+        commits.push_back(commit);
+    }
+
+    return commits;
 }
 
 
@@ -76,16 +82,11 @@ std::vector<Repo> Github::fetchAllRepos() {
 
     
     for (int i = 0; i < cJSON_GetArraySize(cJSON_Parse(readBuffer.c_str())); i++) {
-        repositories.push_back(Repo(cJSON_GetArrayItem(cJSON_Parse(readBuffer.c_str()),i)));
-        commits = cJSON_Parse(this->getCommits(repositories[i].getName()).c_str());
-
-        for (int j = 0; j < cJSON_GetArraySize(commits); j++) {
-            printf("%s", cJSON_GetArrayItem(commits, j)->valuestring);
-            repositories[i].addCommit(cJSON_GetArrayItem(commits, j));
-        }
-        
+        Repo myRepo(cJSON_GetArrayItem(cJSON_Parse(readBuffer.c_str()),i));
+        printf("%d: %s\n", i, myRepo.getName().c_str());
+        myRepo.setCommits(fetchCommits(myRepo.getName()));
+        repositories.push_back(myRepo);
     }
-    
 
     return repositories;
 }

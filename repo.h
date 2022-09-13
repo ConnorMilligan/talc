@@ -18,7 +18,7 @@ public:
     std::string getName();
     std::vector<Commit> getCommits();
 
-    void addCommit(Commit commit);
+    void setCommits(std::vector<Commit> commits);
     
 };
 

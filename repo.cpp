@@ -13,6 +13,6 @@ std::vector<Commit> Repo::getCommits() {
     return this->commits;
 }
 
-void Repo::addCommit(Commit commit) {
-    this->commits.push_back(commit);
+void Repo::setCommits(std::vector<Commit> commits) {
+    this->commits = commits;
 }
