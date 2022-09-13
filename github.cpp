@@ -51,13 +51,14 @@ std::vector<Repo> Github::fetchProject(std::string assignment) {
 std::vector<Repo> Github::fetchAllRepos() {
     CURL *curl;
     CURLcode res;
+    cJSON *commits;
     std::string readBuffer;
     std::string token = getenv("GITHUB_TOKEN");
     struct curl_slist *headers = NULL;
     std::vector<Repo> repositories;
 
     curl = curl_easy_init();
-
+    
     if(curl) {
         curl_easy_setopt(curl, CURLOPT_URL, ("https://api.github.com/orgs/" + this->organization + "/repos?page=2").c_str());
 
@@ -73,10 +74,18 @@ std::vector<Repo> Github::fetchAllRepos() {
         curl_easy_cleanup(curl);
     }
 
-    Repo myRepo(cJSON_GetArrayItem(cJSON_Parse(readBuffer.c_str()),1));
-    printf("%s\n",myRepo.getName().c_str());
+    
+    for (int i = 0; i < cJSON_GetArraySize(cJSON_Parse(readBuffer.c_str())); i++) {
+        repositories.push_back(Repo(cJSON_GetArrayItem(cJSON_Parse(readBuffer.c_str()),i)));
+        commits = cJSON_Parse(this->getCommits(repositories[i].getName()).c_str());
 
-    printf("%d\n",cJSON_GetArraySize(cJSON_Parse(getCommits(myRepo.getName()).c_str())));
+        for (int j = 0; j < cJSON_GetArraySize(commits); j++) {
+            printf("%s", cJSON_GetArrayItem(commits, j)->valuestring);
+            repositories[i].addCommit(cJSON_GetArrayItem(commits, j));
+        }
+        
+    }
+    
 
     return repositories;
 }

@@ -14,6 +14,8 @@ public:
 
     std::string getAuthorDate();
     std::string getCommitDate();
+
+    friend std::ostream& operator << (std::ostream &outs, const Commit &commit);
 };
 
 #endif

@@ -16,7 +16,9 @@ public:
     Repo(cJSON *json);
 
     std::string getName();
-    std::string getAuthor();
+    std::vector<Commit> getCommits();
+
+    void addCommit(Commit commit);
     
 };
 
