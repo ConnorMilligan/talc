@@ -62,31 +62,40 @@ std::vector<Repo> Github::fetchAllRepos() {
     std::string token = getenv("GITHUB_TOKEN");
     struct curl_slist *headers = NULL;
     std::vector<Repo> repositories;
+    int count = 1;
 
-    curl = curl_easy_init();
-    
-    if(curl) {
-        curl_easy_setopt(curl, CURLOPT_URL, ("https://api.github.com/orgs/" + this->organization + "/repos?page=2").c_str());
-
-        headers = curl_slist_append(headers, "User-Agent: Talc");
-        headers = curl_slist_append(headers, ("Authorization: Bearer " + token).c_str());
+    do {
+        curl = curl_easy_init();
         
-        curl_easy_setopt(curl, CURLOPT_HTTPHEADER,headers);
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
+        if(curl) {
+            std::string url = "https://api.github.com/orgs/" + this->organization + "/repos?page=" + std::to_string(count);
+            curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+printf("%s\n", url.c_str());
+            headers = curl_slist_append(headers, "User-Agent: Talc");
+            headers = curl_slist_append(headers, ("Authorization: Bearer " + token).c_str());
+            
+            curl_easy_setopt(curl, CURLOPT_HTTPHEADER,headers);
+            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+            curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
 
-        res = curl_easy_perform(curl);
-    
-        curl_easy_cleanup(curl);
-    }
+            res = curl_easy_perform(curl);
+        
+            curl_easy_cleanup(curl);
+        }
 
-    
-    for (int i = 0; i < cJSON_GetArraySize(cJSON_Parse(readBuffer.c_str())); i++) {
-        Repo myRepo(cJSON_GetArrayItem(cJSON_Parse(readBuffer.c_str()),i));
-        printf("%d: %s\n", i, myRepo.getName().c_str());
-        myRepo.setCommits(fetchCommits(myRepo.getName()));
-        repositories.push_back(myRepo);
-    }
+        
+        for (int i = 0; i < cJSON_GetArraySize(cJSON_Parse(readBuffer.c_str())); i++) {
+            Repo myRepo(cJSON_GetArrayItem(cJSON_Parse(readBuffer.c_str()),i));
+            printf("%d: %s\n", i+((count-1)*30), myRepo.getName().c_str());
+            //myRepo.setCommits(fetchCommits(myRepo.getName()));
+            repositories.push_back(myRepo);
+        }
+        count++;
+    //} while (cJSON_GetArraySize(cJSON_Parse(readBuffer.c_str())) == 30);
+    } while (count < 3);
+
+
+    printf("%d", repositories.size());
 
     return repositories;
 }
