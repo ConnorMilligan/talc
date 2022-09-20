@@ -51,7 +51,7 @@ std::string Github::fetchRepoPage(int page) {
     curl = curl_easy_init();
         
     if(curl) {
-        url = "https://api.github.com/orgs/" + this->organization + "/repos?page=" + std::to_string(page);
+        url = "https://api.github.com/orgs/" + this->organization + "/repos?page=" + std::to_string(page) + "&per_page=" + std::to_string(NUM_PER_PAGE);
 
         curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
         printf("%s\n", url.c_str());
@@ -89,18 +89,18 @@ std::vector<Repo> Github::fetchProject(std::string assignment) {
 
 std::vector<Repo> Github::fetchAllRepos() {
     std::vector<Repo> repositories;
-    std::string repoString;
+    cJSON *repoPage;
     int count = 1;
 
     do {
-        repoString = fetchRepoPage(count);
-        for (int i = 0; i < cJSON_GetArraySize(cJSON_Parse(repoString.c_str())); i++) {
-            Repo myRepo(cJSON_GetArrayItem(cJSON_Parse(repoString.c_str()),i));
-            printf("%d: %s\n", i+((count-1)*30), myRepo.getName().c_str());
+        repoPage = cJSON_Parse(fetchRepoPage(count).c_str());
+        for (int i = 0; i < cJSON_GetArraySize(repoPage); i++) {
+            Repo myRepo(cJSON_GetArrayItem(repoPage,i));
+            printf("%d: %s\n", i+((count-1)*NUM_PER_PAGE), myRepo.getName().c_str());
             repositories.push_back(myRepo);
         }
         count++;
-    } while (count < 2);
+    } while (cJSON_GetArraySize(repoPage) == NUM_PER_PAGE);;
 
 
     printf("%d", repositories.size());

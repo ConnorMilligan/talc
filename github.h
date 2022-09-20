@@ -8,6 +8,8 @@
 
 #include "repo.h"
 
+#define NUM_PER_PAGE 100
+
 class Github
 {
 private:
