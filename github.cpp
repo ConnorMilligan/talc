@@ -6,6 +6,42 @@ static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *use
     return size * nmemb;
 }
 
+Github::Github(std::string organization) {
+    this->organization = organization;
+    this->numRepos = fetchNumRepos(organization);
+}
+
+int Github::fetchNumRepos(std::string org) {
+    CURL *curl;
+    CURLcode res;
+    std::string readBuffer;
+    std::string token = getenv("GITHUB_TOKEN");
+    struct curl_slist *headers = NULL;
+    cJSON *organization;
+
+    curl = curl_easy_init();
+
+    if(curl) {
+        curl_easy_setopt(curl, CURLOPT_URL, ("https://api.github.com/orgs/" + org).c_str());
+
+        headers = curl_slist_append(headers, "User-Agent: Talc");
+        headers = curl_slist_append(headers, ("Authorization: Bearer " + token).c_str());
+        
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER,headers);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
+
+        res = curl_easy_perform(curl);
+    
+        curl_easy_cleanup(curl);
+    }
+
+    organization = cJSON_Parse(readBuffer.c_str());
+
+    return cJSON_GetObjectItemCaseSensitive(organization, "total_private_repos")->valueint;
+}
+
+
 std::vector<Commit> Github::fetchCommits(std::string repo) {
     CURL *curl;
     CURLcode res;
@@ -54,7 +90,6 @@ std::string Github::fetchRepoPage(int page) {
         url = "https://api.github.com/orgs/" + this->organization + "/repos?page=" + std::to_string(page) + "&per_page=" + std::to_string(NUM_PER_PAGE);
 
         curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-        printf("%s\n", url.c_str());
         headers = curl_slist_append(headers, "User-Agent: Talc");
         headers = curl_slist_append(headers, ("Authorization: Bearer " + token).c_str());
             
@@ -69,16 +104,6 @@ std::string Github::fetchRepoPage(int page) {
 
         
     return readBuffer;
-}
-
-
-
-Github::Github() {
-    this->organization = "";
-}
-
-Github::Github(std::string organization) {
-    this->organization = organization;
 }
 
 std::vector<Repo> Github::fetchProject(std::string assignment) {
@@ -96,14 +121,11 @@ std::vector<Repo> Github::fetchAllRepos() {
         repoPage = cJSON_Parse(fetchRepoPage(count).c_str());
         for (int i = 0; i < cJSON_GetArraySize(repoPage); i++) {
             Repo myRepo(cJSON_GetArrayItem(repoPage,i));
-            printf("%d: %s\n", i+((count-1)*NUM_PER_PAGE), myRepo.getName().c_str());
+            //printf("%d: %s\n", i+((count-1)*NUM_PER_PAGE), myRepo.getName().c_str());
             repositories.push_back(myRepo);
         }
         count++;
     } while (cJSON_GetArraySize(repoPage) == NUM_PER_PAGE);;
-
-
-    printf("%d", repositories.size());
 
     return repositories;
 }
