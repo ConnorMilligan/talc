@@ -13,7 +13,7 @@ int main(int argc, char **argv) {
     Github github(args.organization);
     std::vector<Repo> repositories = github.fetchAllRepos();
 
-    std::cout << repositories.size() << std::endl;
+    //std::cout << repositories.size() << std::endl;
 
     //cJSON *json = cJSON_Parse(fetchRepos(args.organization).c_str());
     //std::cout << cJSON_Print(cJSON_GetArrayItem(json,29)) << std::endl;

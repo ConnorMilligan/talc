@@ -3,11 +3,13 @@
 #include <iostream>
 
 Commit::Commit(cJSON *json) {
+    // Fetch the author commit date as a string
     this->authorDate = cJSON_GetObjectItemCaseSensitive(
         cJSON_GetObjectItemCaseSensitive(
         cJSON_GetObjectItemCaseSensitive(
             json, "commit"), "author"), "name")->valuestring;
 
+    // Fetch the commit date as a string
     this->commitDate = cJSON_GetObjectItemCaseSensitive(
         cJSON_GetObjectItemCaseSensitive(
         cJSON_GetObjectItemCaseSensitive(
