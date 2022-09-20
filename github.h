@@ -12,7 +12,9 @@ class Github
 {
 private:
     std::string organization;
+
     std::vector<Commit> fetchCommits(std::string repo);
+    std::string fetchRepoPage(int page);
 public:
     Github();
     Github(std::string organization);
