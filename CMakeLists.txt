@@ -6,5 +6,5 @@ find_package( CURL )
 find_package( cJSON )
 
 
-add_executable(talc main.cpp talcutil.cpp github.cpp repo.cpp commit.cpp bar.cpp)
+add_executable(talc main.cpp argParser.cpp github.cpp repo.cpp commit.cpp bar.cpp)
 target_link_libraries(talc curl cjson)

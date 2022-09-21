@@ -1,16 +1,19 @@
-#include "talcutil.h"
+#include "argParser.h"
 #include "github.h"
 
 #include <iostream>
 #include <cjson/cJSON.h>
 
 int main(int argc, char **argv) {
-    struct commandArgs args;
-    
-    
-    processArgs(&args, &argc, &argv);
-    
-    Github github(args.organization);
+    argParser args(argc, argv);
+
+    if (args.getOrganization() == "") {
+        std::cout << "Please use the -o flag to specify which organization you wish to pull repos from" << std::endl;
+        return 0;
+    }
+
+
+    Github github(args.getOrganization());
     std::vector<Repo> repositories = github.fetchAllRepos();
 
     //std::cout << repositories.size() << std::endl;
