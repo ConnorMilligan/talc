@@ -1,7 +1,10 @@
 #include "github.h"
 #include "bar.h"
 
+#include <stdexcept>
+
 // This is the writer to put the output of the API call to a string
+// it's magic. don't touch it.
 static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp)
 {
     ((std::string*)userp)->append((char*)contents, size * nmemb);
@@ -48,6 +51,10 @@ int Github::fetchNumRepos(std::string org) {
 
     // Parse the raw string into a cJSON
     organization = cJSON_Parse(readBuffer.c_str());
+
+    // Prevent a segfault by giving a readable error
+    if (!cJSON_HasObjectItem(organization, "total_private_repos"))
+        throw std::invalid_argument("The given organization cannot be found!");
 
     // Return the total repos field as a string
     return cJSON_GetObjectItemCaseSensitive(organization, "total_private_repos")->valueint;
