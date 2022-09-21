@@ -29,6 +29,11 @@ class Github {
         int numRepos;
 
         /**
+         * @brief a vector of the repositories in the organization
+         */
+        std::vector<Repo> repositories;
+
+        /**
          * @brief Returns the number of repositories in the organization
          * 
          * This will fetch the number of repositories provided by the organization
@@ -40,12 +45,11 @@ class Github {
         int fetchNumRepos(std::string org);
 
         /**
-         * @brief Will retrieve the commits of a given repository by name
+         * @brief Will retrieve the commits of a given repository
          * 
-         * @param repo The name of the repository
-         * @return std::vector<Commit> A vector of Commit objects of the given repository
+         * @param repo A pointer to the repo to add commits to
          */
-        std::vector<Commit> fetchCommits(std::string repo);
+        void fetchCommits(Repo *repo);
 
         /**
          * @brief Retrieves the REST API response for a given page
@@ -58,6 +62,14 @@ class Github {
          * @return std::string The raw rest API output of the given page
          */
         std::string fetchRepoPage(int page);
+
+
+        /**
+         * @brief Fetches all repositories in the organization
+         * 
+         * @return std::vector<Repo> A vector of all repositories in the organization
+         */
+        std::vector<Repo> fetchAllRepos();
         
     public:
         /**
@@ -74,14 +86,6 @@ class Github {
          * @return std::vector<Repo> A vector of the repositories matching the name
          */
         std::vector<Repo> fetchProject(std::string assignment);
-
-        /**
-         * @brief Fetches all repositories in the organization
-         * 
-         * @return std::vector<Repo> A vector of all repositories in the organization
-         */
-        std::vector<Repo> fetchAllRepos();
-    
 };
 
 #endif

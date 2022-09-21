@@ -14,6 +14,7 @@ static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *use
 Github::Github(std::string organization) {
     this->organization = organization;
     this->numRepos = fetchNumRepos(organization);
+    this->repositories = fetchAllRepos();
 }
 
 int Github::fetchNumRepos(std::string org) {
@@ -52,7 +53,7 @@ int Github::fetchNumRepos(std::string org) {
     // Parse the raw string into a cJSON
     organization = cJSON_Parse(readBuffer.c_str());
 
-    // Prevent a segfault by giving a readable error
+    // Prevent a segfault by giving a readable error;
     if (!cJSON_HasObjectItem(organization, "total_private_repos"))
         throw std::invalid_argument("The given organization cannot be found!");
 
@@ -61,7 +62,7 @@ int Github::fetchNumRepos(std::string org) {
 }
 
 
-std::vector<Commit> Github::fetchCommits(std::string repo) {
+void Github::fetchCommits(Repo *repo) {
     CURL *curl;
     CURLcode res;
     std::string readBuffer;
@@ -74,7 +75,7 @@ std::vector<Commit> Github::fetchCommits(std::string repo) {
 
     if(curl) {
         // Fetch the commits of a repo
-        curl_easy_setopt(curl, CURLOPT_URL, ("https://api.github.com/repos/" + this->organization + '/'+ repo + "/commits").c_str());
+        curl_easy_setopt(curl, CURLOPT_URL, ("https://api.github.com/repos/" + this->organization + '/'+ repo->getName() + "/commits").c_str());
 
         // Set the user agent and authentication in the header
         headers = curl_slist_append(headers, "User-Agent: Talc");
@@ -100,8 +101,7 @@ std::vector<Commit> Github::fetchCommits(std::string repo) {
         Commit commit(cJSON_GetArrayItem(cJSON_Parse(readBuffer.c_str()),i));
         commits.push_back(commit);
     }
-
-    return commits;
+    repo->setCommits(commits);
 }
 
 std::string Github::fetchRepoPage(int page) {
@@ -144,10 +144,15 @@ std::string Github::fetchRepoPage(int page) {
 }
 
 std::vector<Repo> Github::fetchProject(std::string assignment) {
-    // TODO
-    std::vector<Repo> repositories;
+    std::vector<Repo> projectRepos;    
+    
+    for (int i = 0; i < this->repositories.size(); i++) {
+        if (this->repositories[i].getName().find(assignment) != std::string::npos) {
+            projectRepos.push_back(this->repositories[i]);
+        }
+    }
 
-    return repositories;
+    return projectRepos;
 }
 
 std::vector<Repo> Github::fetchAllRepos() {
@@ -155,6 +160,8 @@ std::vector<Repo> Github::fetchAllRepos() {
     cJSON *repoPage;
     float progress;
     int count = 1;
+
+    printf("Fetching repositories from %s...\n", this->organization.c_str());
 
     // Loop until the fetched page has less than the set page number
     // TODO: will crash if the divisor is 0, this can be fixed by changing NUM_PER_PAGE

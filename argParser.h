@@ -12,6 +12,11 @@ class argParser {
         std::string organization;
 
         /**
+         * @brief The project to fetch
+         */
+        std::string project;
+
+        /**
          * @brief A vector of all the command line arguments passed
          */
         std::vector<std::string> arguments;
@@ -30,6 +35,13 @@ class argParser {
          * @return std::string 
          */
         std::string getOrganization();
+
+        /**
+         * @brief Get the Project
+         * 
+         * @return std::string 
+         */
+        std::string getProject();
 };
 
 #endif
