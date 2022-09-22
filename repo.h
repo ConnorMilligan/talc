@@ -1,7 +1,7 @@
 #ifndef REPO_H
 #define REPO_H
 
-#include <string>
+#include <iostream>
 #include <vector>
 #include <cjson/cJSON.h>
 
@@ -22,6 +22,11 @@ class Repo {
          * @brief A vector containing all the commits in the repo
          */
         std::vector<Commit> commits;
+
+        /**
+         * @brief A vector that contains the index of all commits with mismatched dates in the commit vector
+         */
+        std::vector<int> faultyCommits;
     public:
 
         /**
@@ -51,7 +56,18 @@ class Repo {
          * @param commits vector of commits
          */
         void setCommits(std::vector<Commit> commits);
-        
+
+        /**
+         * @brief Parse through the commits and add any that do not match to the according vector
+         * 
+         * @return bool if the repository has a faulty commit
+         */
+        bool findMismatchedDates();
+
+        /**
+         * @brief Prints out the repository information and the suspect commits
+         */
+        void printRepo();
 };
 
 #endif

@@ -16,6 +16,10 @@ class Commit {
          */
         std::string commitDate;
 
+        /**
+         * @brief The commit message
+         */
+        std::string commitMessage;
     public:
         /**
          * @brief Construct a new Commit object
@@ -38,8 +42,12 @@ class Commit {
          */
         std::string getCommitDate();
 
-        // Overload print output
-        friend std::ostream& operator << (std::ostream &outs, const Commit &commit);
+        /**
+         * @brief Get the commit message
+         * 
+         * @return std::string The commit message
+         */
+        std::string getCommitMessage();
 };
 
 #endif

@@ -14,6 +14,11 @@ Commit::Commit(cJSON *json) {
         cJSON_GetObjectItemCaseSensitive(
         cJSON_GetObjectItemCaseSensitive(
             json, "commit"), "committer"), "date")->valuestring;
+
+    // Fetch the commit message as a string
+    this->commitMessage = cJSON_GetObjectItemCaseSensitive(
+        cJSON_GetObjectItemCaseSensitive(
+            json, "commit"), "message")->valuestring;
 }
 
 std::string Commit::getAuthorDate() {
@@ -24,8 +29,6 @@ std::string Commit::getCommitDate() {
     return this->commitDate;
 }
 
-
-std::ostream& operator << (std::ostream &outs, const Commit &commit) {
-    //outs << commit.getAuthorDate() << " " << commit.getCommitDate() << std::endl;
-    return outs;
+std::string Commit::getCommitMessage() {
+    return this->commitMessage;
 }

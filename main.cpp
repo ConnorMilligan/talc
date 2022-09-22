@@ -1,10 +1,13 @@
 #include "argParser.h"
 #include "github.h"
+#include "bar.h"
 
 #include <iostream>
 #include <cjson/cJSON.h>
 
 int main(int argc, char **argv) {
+    float progress;
+    std::vector<int> falseRepos;
     argParser args(argc, argv);
 
     if (args.getOrganization() == "") {
@@ -33,11 +36,18 @@ int main(int argc, char **argv) {
     std::cout << std::endl << "Fetching all commits for the pulled repositories..." << std::endl;
     github.setAllCommits(&repositories);
     
-    std::cout << std::endl << repositories.front().getCommits().front().getAuthorDate() << std::endl;
+    std::cout << std::endl << "Searching repositories for faulty commits..." << std::endl;
+    
+    for (int i = 0; i < repositories.size(); i++)
+        if (repositories[i].findMismatchedDates()) 
+            falseRepos.push_back(i);
 
-    //cJSON *json = cJSON_Parse(fetchRepos(args.organization).c_str());
-    //std::cout << cJSON_Print(cJSON_GetArrayItem(json,29)) << std::endl;
-    //std::cout << cJSON_GetArraySize(json) << std::endl;
+    std::cout << std::endl << "Found " + std::to_string(falseRepos.size()) + " repositories with mismatched commit times." << std::endl;
+
+    for (int i = 0; i < falseRepos.size(); i++)
+        repositories[falseRepos[i]].printRepo();
+    
+    
     
     return 0;
 }

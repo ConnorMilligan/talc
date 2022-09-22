@@ -4,6 +4,8 @@ Repo::Repo(cJSON *json) {
     //Fetches the name field from the JSON as a string
     this->name = cJSON_GetObjectItemCaseSensitive(json, "name")->valuestring;
     this->commits = std::vector<Commit>();
+    this->faultyCommits = std::vector<int>();
+
 }
 
 std::string Repo::getName() {
@@ -16,4 +18,30 @@ std::vector<Commit> Repo::getCommits() {
 
 void Repo::setCommits(std::vector<Commit> commits) {
     this->commits = commits;
+}
+
+
+bool Repo::findMismatchedDates() {
+    for (int i = 0; i < this->commits.size(); i++) {
+        if (this->commits[i].getAuthorDate() != this->commits[i].getCommitDate()) {
+            this->faultyCommits.push_back(i);
+        }
+    }
+    return (this->faultyCommits.size() != 0);
+}
+
+// This is a bit sloppy, i'll change it to an overloaded operator later
+void Repo::printRepo() {
+    std::cout << "──────────────────────────────────────────────" << std::endl;
+    std::cout << "Name: " + this->name << std::endl;
+    std::cout << "Commits: " + std::to_string(this->commits.size()) << std::endl;
+    std::cout << "Suspect commits: " + std::to_string(this->faultyCommits.size()) << std::endl;
+    std::cout << std::endl << " ~<>~ Odd commits ~<>~" << std::endl;
+
+    for (int i = 0; i < this->faultyCommits.size(); i++) {
+        std::cout << "Commit #" << this->faultyCommits[i] << std::endl;
+        std::cout << " * Commit message: " << this->commits[this->faultyCommits[i]].getCommitMessage() << std::endl;
+        std::cout << " * Author date: " << this->commits[this->faultyCommits[i]].getAuthorDate() << std::endl;
+        std::cout << " * Commit date: " << this->commits[this->faultyCommits[i]].getCommitDate() << std::endl<< std::endl;
+    }
 }
