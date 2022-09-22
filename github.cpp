@@ -189,3 +189,17 @@ std::vector<Repo> Github::fetchAllRepos() {
 
     return repositories;
 }
+
+void Github::setAllCommits(std::vector<Repo> *repositories) {
+    float progress;
+
+    for (int i = 0; i < repositories->size(); i++) {
+        progress = float(i)/float(repositories->size());
+        print_progressbar(progress,"Progress: ", (std::to_string(int(progress*100)) + "%").c_str());
+
+        fetchCommits(&repositories->at(i));
+    }
+
+    print_progressbar(1,"Progress: ", "100%");
+
+}

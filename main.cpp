@@ -30,6 +30,11 @@ int main(int argc, char **argv) {
 
     std::cout << "Found " + std::to_string(repositories.size()) + " repositories that match the given project name!" << std::endl;
 
+    std::cout << std::endl << "Fetching all commits for the pulled repositories..." << std::endl;
+    github.setAllCommits(&repositories);
+    
+    std::cout << std::endl << repositories.front().getCommits().front().getAuthorDate() << std::endl;
+
     //cJSON *json = cJSON_Parse(fetchRepos(args.organization).c_str());
     //std::cout << cJSON_Print(cJSON_GetArrayItem(json,29)) << std::endl;
     //std::cout << cJSON_GetArraySize(json) << std::endl;

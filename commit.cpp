@@ -7,13 +7,13 @@ Commit::Commit(cJSON *json) {
     this->authorDate = cJSON_GetObjectItemCaseSensitive(
         cJSON_GetObjectItemCaseSensitive(
         cJSON_GetObjectItemCaseSensitive(
-            json, "commit"), "author"), "name")->valuestring;
+            json, "commit"), "author"), "date")->valuestring;
 
     // Fetch the commit date as a string
     this->commitDate = cJSON_GetObjectItemCaseSensitive(
         cJSON_GetObjectItemCaseSensitive(
         cJSON_GetObjectItemCaseSensitive(
-            json, "commit"), "committer"), "name")->valuestring;
+            json, "commit"), "committer"), "date")->valuestring;
 }
 
 std::string Commit::getAuthorDate() {

@@ -86,6 +86,13 @@ class Github {
          * @return std::vector<Repo> A vector of the repositories matching the name
          */
         std::vector<Repo> fetchProject(std::string assignment);
+
+        /**
+         * @brief Fetches and sets all the commits of all repositories in a vector
+         * 
+         * @param repositories Pointer to a vector of repositories
+         */
+        void setAllCommits(std::vector<Repo> *repositories);
 };
 
 #endif
