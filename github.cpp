@@ -54,6 +54,7 @@ int Github::fetchNumRepos(std::string org) {
     organization = cJSON_Parse(readBuffer.c_str());
 
     // Prevent a segfault by giving a readable error;
+    // This is an awful way to handle this error... too bad!
     if (!cJSON_HasObjectItem(organization, "total_private_repos"))
         throw std::invalid_argument("The given organization cannot be found!");
 
@@ -166,6 +167,10 @@ std::vector<Repo> Github::fetchAllRepos() {
     // Loop until the fetched page has less than the set page number
     // TODO: will crash if the divisor is 0, this can be fixed by changing NUM_PER_PAGE
     do {
+        //Print a progress bar
+        progress = float(repositories.size())/float(this->numRepos);
+        print_progressbar(progress,"Progress: ", (std::to_string(int(progress*100)) + "%").c_str());
+
         repoPage = cJSON_Parse(fetchRepoPage(count).c_str());
         // Build the fetched repos into objects and add to the vector
         for (int i = 0; i < cJSON_GetArraySize(repoPage); i++) {
@@ -174,12 +179,13 @@ std::vector<Repo> Github::fetchAllRepos() {
             repositories.push_back(myRepo);
         }
         
-        //Print a progress bar
-        progress = float(repositories.size())/float(this->numRepos);
-        print_progressbar(progress,"Progress: ", (std::to_string(int(progress*100)) + "%").c_str());
         count++;
 
     } while (cJSON_GetArraySize(repoPage) == NUM_PER_PAGE);;
+
+    // Make sure it prints out 100% at the end.
+    progress = float(repositories.size())/float(this->numRepos);
+    print_progressbar(progress,"Progress: ", (std::to_string(int(progress*100)) + "%").c_str());
 
     return repositories;
 }
