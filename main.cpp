@@ -2,15 +2,24 @@
 #include "github.h"
 #include "bar.h"
 
+#include <ctime>
+#include <sstream>
 #include <iostream>
+#include <iomanip>
 #include <cjson/cJSON.h>
+
+std::time_t getEpochTime(const std::wstring& dateTime);
 
 int main(int argc, char **argv) {
     float progress;
-    std::vector<int> falseRepos;
+    std::vector<int> falseRepos, lateRepos;
     argParser args(argc, argv);
 
-    if (args.getOrganization() == "") {
+    if (args.getHelp()) {
+        std::cout << "Help me!!" << std::endl;
+        return 0;
+    }
+    else if (args.getOrganization() == "") {
         std::cout << "Please use the -o flag to specify which organization you wish to pull repos from" << std::endl;
         return 0;
     }
@@ -18,6 +27,7 @@ int main(int argc, char **argv) {
         std::cout << "Please use the -p flag to specify which project you would like to process" << std::endl;
         return 0;
     }
+
 
 
     Github github(args.getOrganization());
@@ -50,4 +60,15 @@ int main(int argc, char **argv) {
     
     
     return 0;
+}
+
+
+// https://stackoverflow.com/questions/4781852/how-to-convert-a-string-to-datetime-in-c
+std::time_t getEpochTime(const std::wstring& dateTime) {
+   static const std::wstring dateTimeFormat{ L"%Y-%m-%dT%H:%M:%SZ" };
+   std::wistringstream ss{ dateTime };
+   std::tm dt;
+
+   ss >> std::get_time(&dt, dateTimeFormat.c_str());
+   return std::mktime(&dt);
 }

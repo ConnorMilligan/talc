@@ -17,6 +17,16 @@ class argParser {
         std::string project;
 
         /**
+         * @brief The time of the deadline
+         */
+        std::string time;
+
+        /**
+         * @brief If the help flag has been used
+         */
+        bool help;
+
+        /**
          * @brief A vector of all the command line arguments passed
          */
         std::vector<std::string> arguments;
@@ -42,6 +52,20 @@ class argParser {
          * @return std::string 
          */
         std::string getProject();
+
+        /**
+         * @brief Get the Time
+         * 
+         * @return std::string 
+         */
+        std::string getTime();
+
+        /**
+         * @brief Get the Help
+         * 
+         * @return bool if the help flag is tripped
+         */
+        bool getHelp();
 };
 
 #endif
