@@ -8,27 +8,35 @@
 #include <iomanip>
 #include <cjson/cJSON.h>
 
-std::time_t getEpochTime(const std::wstring& dateTime);
+std::time_t getEpochTime(const std::string dateTime);
 
 int main(int argc, char **argv) {
     float progress;
     std::vector<int> falseRepos, lateRepos;
+    std::time_t deadline;
     argParser args(argc, argv);
 
     if (args.getHelp()) {
         std::cout << "Help me!!" << std::endl;
         return 0;
     }
+    else if (getenv("GITHUB_TOKEN") == NULL) {
+        std::cout << "No github token found. Make sure the \"GITHUB_TOKEN\" has been set!" << std::endl;
+        return 1;
+    }
     else if (args.getOrganization() == "") {
         std::cout << "Please use the -o flag to specify which organization you wish to pull repos from" << std::endl;
-        return 0;
+        return 1;
     }
     else if (args.getProject() == "") {
         std::cout << "Please use the -p flag to specify which project you would like to process" << std::endl;
-        return 0;
+        return 1;
     }
 
 
+    deadline = getEpochTime(args.getTime());
+
+    std::cout << asctime(gmtime(&deadline)) << std::endl;
 
     Github github(args.getOrganization());
     std::vector<Repo> repositories = github.fetchProject(args.getProject());
@@ -38,7 +46,7 @@ int main(int argc, char **argv) {
 
     if (repositories.size() == 0) {
         std::cout << "No repositories with the project name found. Check for typos?" << std::endl;
-        return 0;
+        return 1;
     }
 
     std::cout << "Found " + std::to_string(repositories.size()) + " repositories that match the given project name!" << std::endl;
@@ -64,9 +72,9 @@ int main(int argc, char **argv) {
 
 
 // https://stackoverflow.com/questions/4781852/how-to-convert-a-string-to-datetime-in-c
-std::time_t getEpochTime(const std::wstring& dateTime) {
-   static const std::wstring dateTimeFormat{ L"%Y-%m-%dT%H:%M:%SZ" };
-   std::wistringstream ss{ dateTime };
+std::time_t getEpochTime(const std::string dateTime) {
+   static const std::string dateTimeFormat{ "%Y-%m-%dT%H:%M:%SZ" };
+   std::istringstream ss{ dateTime };
    std::tm dt;
 
    ss >> std::get_time(&dt, dateTimeFormat.c_str());
