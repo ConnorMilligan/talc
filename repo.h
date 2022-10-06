@@ -27,6 +27,11 @@ class Repo {
          * @brief A vector that contains the index of all commits with mismatched dates in the commit vector
          */
         std::vector<int> faultyCommits;
+
+        /**
+         * @brief If the repository has commits past the deadline
+         */
+        bool pastDeadline;
     public:
 
         /**
@@ -63,6 +68,13 @@ class Repo {
          * @return bool if the repository has a faulty commit
          */
         bool findMismatchedDates();
+
+        /**
+         * @brief Flag the repository if there is a commit is passed the deadline
+         * 
+         * @param deadline the deadline of the project
+         */
+        void findLateCommits(std::string deadline);
 
         /**
          * @brief Prints out the repository information and the suspect commits

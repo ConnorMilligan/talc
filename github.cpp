@@ -1,9 +1,8 @@
 #include "github.h"
 #include "bar.h"
+#include "time.h"
 
 #include <stdexcept>
-#include <sstream>
-#include <iomanip>
 
 // This is the writer to put the output of the API call to a string
 // it's magic. don't touch it.
@@ -216,16 +215,7 @@ void Github::setAllCommits(std::vector<Repo> *repositories) {
 
 }
 
-std::time_t Github::getEpochTime(const std::string dateTime) {
-   static const std::string dateTimeFormat{ "%Y-%m-%dT%H:%M:%SZ" };
-   std::istringstream ss{ dateTime };
-   std::tm dt;
-
-   ss >> std::get_time(&dt, dateTimeFormat.c_str());
-   return std::mktime(&dt);
-}
-
 std::string Github::getDeadlineTime() {
-    time_t deadline = this->getEpochTime(this->deadline);
+    time_t deadline = getEpochTime(this->deadline);
     return asctime(gmtime(&deadline));
 }

@@ -1,11 +1,14 @@
 #include "repo.h"
+#include "time.h"
+
+#include <ctime>
 
 Repo::Repo(cJSON *json) {
     //Fetches the name field from the JSON as a string
     this->name = cJSON_GetObjectItemCaseSensitive(json, "name")->valuestring;
     this->commits = std::vector<Commit>();
     this->faultyCommits = std::vector<int>();
-
+    this->pastDeadline = false;
 }
 
 std::string Repo::getName() {
@@ -28,6 +31,18 @@ bool Repo::findMismatchedDates() {
         }
     }
     return (this->faultyCommits.size() != 0);
+}
+
+void Repo::findLateCommits(std::string deadline) {
+    time_t commitTime, deadlineTime = getEpochTime(deadline);
+
+    for (int i = 0; i < this->commits.size(); i++) {
+        commitTime = getEpochTime(this->commits[i].getCommitDate());
+        // Make to compare the times
+        if (this->commits[i].getAuthorDate() != this->commits[i].getCommitDate()) {
+            this->faultyCommits.push_back(i);
+        }
+    }
 }
 
 // This is a bit sloppy, i'll change it to an overloaded operator later
