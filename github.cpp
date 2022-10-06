@@ -2,6 +2,8 @@
 #include "bar.h"
 
 #include <stdexcept>
+#include <sstream>
+#include <iomanip>
 
 // This is the writer to put the output of the API call to a string
 // it's magic. don't touch it.
@@ -12,6 +14,16 @@ static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *use
 }
 
 Github::Github(std::string organization) {
+    this->organization = organization;
+    this->numRepos = fetchNumRepos(organization);
+    this->repositories = fetchAllRepos();
+    this->deadline = "";
+}
+
+Github::Github(std::string organization, std::string deadline) {
+    this->deadline = deadline;
+    std::cout << "Entered time for deadline in local timezone: " << this->getDeadlineTime() << std::endl;
+
     this->organization = organization;
     this->numRepos = fetchNumRepos(organization);
     this->repositories = fetchAllRepos();
@@ -202,4 +214,18 @@ void Github::setAllCommits(std::vector<Repo> *repositories) {
 
     print_progressbar(1,"Progress: ", "100%");
 
+}
+
+std::time_t Github::getEpochTime(const std::string dateTime) {
+   static const std::string dateTimeFormat{ "%Y-%m-%dT%H:%M:%SZ" };
+   std::istringstream ss{ dateTime };
+   std::tm dt;
+
+   ss >> std::get_time(&dt, dateTimeFormat.c_str());
+   return std::mktime(&dt);
+}
+
+std::string Github::getDeadlineTime() {
+    time_t deadline = this->getEpochTime(this->deadline);
+    return asctime(gmtime(&deadline));
 }

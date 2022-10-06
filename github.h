@@ -5,6 +5,8 @@
 #include <vector>
 #include <curl/curl.h>
 #include <cjson/cJSON.h>
+#include <ctime>
+
 
 #include "repo.h"
 
@@ -32,6 +34,11 @@ class Github {
          * @brief a vector of the repositories in the organization
          */
         std::vector<Repo> repositories;
+
+        /**
+         * @brief The deadline of the project
+         */
+        std::string deadline;
 
         /**
          * @brief Returns the number of repositories in the organization
@@ -70,6 +77,17 @@ class Github {
          * @return std::vector<Repo> A vector of all repositories in the organization
          */
         std::vector<Repo> fetchAllRepos();
+
+
+        /**
+         * @brief Parses the string in a date format to a ctime object
+         * 
+         * https://stackoverflow.com/questions/4781852/how-to-convert-a-string-to-datetime-in-c
+         * 
+         * @param dateTime - The date as a string
+         * @return std::time_t the date in ctime
+         */
+        std::time_t getEpochTime(const std::string dateTime);
         
     public:
         /**
@@ -78,6 +96,14 @@ class Github {
          * @param organization The name of the organization
          */
         Github(std::string organization);
+
+        /**
+         * @brief Construct a new Github object
+         * 
+         * @param organization The name of the organization
+         * @param deadline The deadline for the project
+         */
+        Github(std::string organization, std::string deadline);
 
         /**
          * @brief Fetch a specific project by assignment name
@@ -93,6 +119,13 @@ class Github {
          * @param repositories Pointer to a vector of repositories
          */
         void setAllCommits(std::vector<Repo> *repositories);
+
+        /**
+         * @brief Get the Deadline Time as a string
+         * 
+         * @return std::string deadline in string format
+         */
+        std::string getDeadlineTime();
 };
 
 #endif
