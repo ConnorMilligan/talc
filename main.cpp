@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <cjson/cJSON.h>
+#include <ctime>
 
 std::time_t getEpochTime(const std::string dateTime);
 
@@ -30,6 +31,7 @@ int main(int argc, char **argv) {
         return 1;
     }
 
+    // This isn't very readable, sorry
     Github github = (!args.getTime().empty()) ? Github(args.getOrganization(), args.getTime()) : Github(args.getOrganization());
     
     std::vector<Repo> repositories = github.fetchProject(args.getProject());
@@ -49,9 +51,13 @@ int main(int argc, char **argv) {
     
     std::cout << std::endl << "Searching repositories for faulty commits..." << std::endl;
     
-    for (int i = 0; i < repositories.size(); i++)
+    for (int i = 0; i < repositories.size(); i++) {
+        if (!args.getTime().empty())
+            repositories[i].findLateCommits(github.getDeadlineTime());
+        
         if (repositories[i].findMismatchedDates()) 
             falseRepos.push_back(i);
+    }
 
     std::cout << std::endl << "Found " + std::to_string(falseRepos.size()) + " repositories with mismatched commit times." << std::endl;
 

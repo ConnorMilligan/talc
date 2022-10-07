@@ -38,9 +38,10 @@ void Repo::findLateCommits(std::string deadline) {
 
     for (int i = 0; i < this->commits.size(); i++) {
         commitTime = getEpochTime(this->commits[i].getCommitDate());
-        // Make to compare the times
-        if (this->commits[i].getAuthorDate() != this->commits[i].getCommitDate()) {
-            this->faultyCommits.push_back(i);
+        if (std::difftime(commitTime, deadlineTime) >= 0.0f) {
+            this->pastDeadline = true;
+            // Sorry (but not actually)
+            break;
         }
     }
 }
