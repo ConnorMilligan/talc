@@ -46,6 +46,10 @@ void Repo::findLateCommits(std::string deadline) {
     }
 }
 
+bool Repo::isLate() {
+    return this->pastDeadline;
+}
+
 // This is a bit sloppy, i'll change it to an overloaded operator later
 void Repo::printRepo() {
     std::cout << "──────────────────────────────────────────────" << std::endl;

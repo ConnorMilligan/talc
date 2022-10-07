@@ -3,6 +3,7 @@
 #include "bar.h"
 
 #include <iostream>
+#include <iomanip>
 #include <cjson/cJSON.h>
 #include <ctime>
 
@@ -15,7 +16,15 @@ int main(int argc, char **argv) {
     argParser args(argc, argv);
 
     if (args.getHelp()) {
-        std::cout << "Help me!!" << std::endl;
+        std::cout << "usage: talc [OPTIONS]" << std::endl << std::endl;
+        std::cout << "Options:" << std::endl;
+        std::cout << std::left << std::setw(30) << "\t-o, --organization STRING" << "The name of the organization." << std::endl;
+        std::cout << std::left << std::setw(30) << "\t-p, --project STRING" << "A filter for which repositories to pull." << std::endl;
+        std::cout << std::left << std::setw(30) << "\t-t, --time STRING" << "(Optional) Will flag repositories past this date" << std::endl;
+        std::cout << std::left << std::setw(30) << "\t" << "Time is in UTC, i.e. 2022-09-18T19:59:00Z" << std::endl;
+
+
+
         return 0;
     }
     else if (getenv("GITHUB_TOKEN") == NULL) {
@@ -64,7 +73,12 @@ int main(int argc, char **argv) {
     for (int i = 0; i < falseRepos.size(); i++)
         repositories[falseRepos[i]].printRepo();
     
-    
+    std::cout << std::endl << std::endl << "Repositories with late commits:" << std::endl;
+
+    for (int i = 0; i < falseRepos.size(); i++)
+        if(repositories[i].isLate())
+            std::cout << repositories[i].getName() << std::endl;
+
     
     return 0;
 }

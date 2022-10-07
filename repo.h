@@ -77,6 +77,13 @@ class Repo {
         void findLateCommits(std::string deadline);
 
         /**
+         * @brief Checks if the repository is late
+         * 
+         * @return bool if the repo is late
+         */
+        bool isLate();
+
+        /**
          * @brief Prints out the repository information and the suspect commits
          */
         void printRepo();
