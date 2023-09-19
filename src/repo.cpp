@@ -36,16 +36,6 @@ bool Repo::findMismatchedDates() {
 
 
 bool Repo::findProfaneCommits(const std::vector<std::string> &profanityList) {
-    // build regex pattern
-    std::string pattern = "\\b(";
-
-    for (size_t i = 0; i < profanityList.size(); ++i) {
-        pattern += (i > 0 ? "|" : "") + profanityList[i];
-    }
-    pattern += ")\\b";
-
-    // case insensitive
-    std::regex regexPattern(pattern, std::regex_constants::icase);
 
     for (int i = 0; i < this->commits.size(); i++) {
         std::string currMessage = this->commits[i].getCommitMessage();
@@ -54,7 +44,6 @@ bool Repo::findProfaneCommits(const std::vector<std::string> &profanityList) {
         }
         for (const std::string& word : profanityList) {
             if (currMessage.find(word) != std::string::npos) {
-                std::cout <<  currMessage + " " + word << std::endl;
                 this->profaneCommits.push_back(i);
             }
         }
