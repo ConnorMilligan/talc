@@ -4,14 +4,17 @@
 
 #include <iostream>
 #include <iomanip>
+#include <fstream>
 #include <cjson/cJSON.h>
 #include <ctime>
 
 std::time_t getEpochTime(const std::string dateTime);
+std::vector<std::string> readProfanityList(const std::string &filename);
 
 int main(int argc, char **argv) {
     float progress;
-    std::vector<int> falseRepos, lateRepos;
+    std::vector<int> falseRepos, lateRepos, profaneRepos;
+    std::vector<std::string> profanity;
     std::time_t deadline;
     argParser args(argc, argv);
 
@@ -22,8 +25,6 @@ int main(int argc, char **argv) {
         std::cout << std::left << std::setw(30) << "\t-p, --project STRING" << "A filter for which repositories to pull." << std::endl;
         std::cout << std::left << std::setw(30) << "\t-t, --time STRING" << "(Optional) Will flag repositories past this date" << std::endl;
         std::cout << std::left << std::setw(30) << "\t" << "Time is in UTC, i.e. 2022-09-18T19:59:00Z" << std::endl;
-
-
 
         return 0;
     }
@@ -37,6 +38,13 @@ int main(int argc, char **argv) {
     }
     else if (args.getProject() == "") {
         std::cout << "Please use the -p flag to specify which project you would like to process" << std::endl;
+        return 1;
+    }
+
+    profanity = readProfanityList("data/profanity.txt");
+
+    if (profanity.size() == 0) {
+        std::cout << "Ensure that the profanity file is accessible (./data/profanity.txt)." << std::endl;
         return 1;
     }
 
@@ -58,7 +66,7 @@ int main(int argc, char **argv) {
     std::cout << std::endl << "Fetching all commits for the pulled repositories..." << std::endl;
     github.setAllCommits(&repositories);
     
-    std::cout << std::endl << "Searching repositories for faulty commits..." << std::endl;
+    std::cout << std::endl << "Searching repositories for suspect commits..." << std::endl;
     
     for (int i = 0; i < repositories.size(); i++) {
         if (!args.getTime().empty())
@@ -66,12 +74,20 @@ int main(int argc, char **argv) {
         
         if (repositories[i].findMismatchedDates()) 
             falseRepos.push_back(i);
+
+        if (repositories[i].findProfaneCommits(profanity))
+            profaneRepos.push_back(i);
     }
 
     std::cout << std::endl << "Found " + std::to_string(falseRepos.size()) + " repositories with mismatched commit times." << std::endl;
 
     for (int i = 0; i < falseRepos.size(); i++)
-        repositories[falseRepos[i]].printRepo();
+        repositories[falseRepos[i]].printMismatchRepo();
+
+    std::cout << std::endl << "Found " + std::to_string(profaneRepos.size()) + " repositories with potentially profane content." << std::endl;
+
+    for (int i = 0; i < profaneRepos.size(); i++)
+        repositories[profaneRepos[i]].printProfaneRepo();
     
     std::cout << std::endl << std::endl << "Repositories with late commits:" << std::endl;
 
@@ -83,4 +99,17 @@ int main(int argc, char **argv) {
     return 0;
 }
 
-
+std::vector<std::string> readProfanityList(const std::string &filename) {
+    std::vector<std::string> profanityList;
+    std::ifstream file(filename);
+    if (file.is_open()) {
+        std::string word;
+        while (getline(file, word)) {
+            profanityList.push_back(word);
+        }
+        file.close();
+    } else {
+        std::cout << "Error: Unable to open profanity file." << std::endl;
+    }
+    return profanityList;
+}

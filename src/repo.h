@@ -29,6 +29,11 @@ class Repo {
         std::vector<int> faultyCommits;
 
         /**
+         * @brief A vector that contains the index of all commits with with text that trip the profanity filter
+         */
+        std::vector<int> profaneCommits;
+
+        /**
          * @brief If the repository has commits past the deadline
          */
         bool pastDeadline;
@@ -70,6 +75,15 @@ class Repo {
         bool findMismatchedDates();
 
         /**
+         * @brief Parse through the commits and add any that trip the profanity filter to the according vector
+         * 
+         * @param profanityList list of profane words to compare against
+         * 
+         * @return bool if the repository has a potentially profane commit
+         */
+        bool findProfaneCommits(const std::vector<std::string> &profanityList);
+
+        /**
          * @brief Flag the repository if there is a commit is passed the deadline
          * 
          * @param deadline the deadline of the project
@@ -84,9 +98,14 @@ class Repo {
         bool isLate();
 
         /**
-         * @brief Prints out the repository information and the suspect commits
+         * @brief Prints out the repository information and the mismatched commits
          */
-        void printRepo();
+        void printMismatchRepo();
+
+        /**
+         * @brief Prints out the repository information and the profane commits
+         */
+        void printProfaneRepo();
 };
 
 #endif

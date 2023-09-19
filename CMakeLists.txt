@@ -26,6 +26,9 @@ endif()
 include_directories(lib/cJSON)
 include_directories(lib/curl/include)
 
+# Put profanity text into the binary directory
+configure_file(${CMAKE_SOURCE_DIR}/res/profanity-words/data/en.txt ${CMAKE_BINARY_DIR}/data/profanity.txt COPYONLY)
+
 # Set source files
 file(GLOB_RECURSE PROJECT_HEADERS ${B_TARGET}/*.h)
 file(GLOB_RECURSE PROJECT_SOURCES ${B_TARGET}/*.cpp)
