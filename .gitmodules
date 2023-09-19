@@ -5,3 +5,6 @@
 	path = lib/curl
 	url = https://github.com/curl/curl.git
 	branch = tiny-curl-8_2
+[submodule "res/profanity-words"]
+	path = res/profanity-words
+	url = https://github.com/coffee-and-fun/google-profanity-words.git
